@@ -11,4 +11,4 @@
 ## npm run dev
 
 # Deplyed Link
-https://one-mdm-server-yp13.vercel.app/
+https://one-mdm-server.vercel.app/
