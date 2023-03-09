@@ -106,22 +106,85 @@ module.exports.getCompany = async (req, res) => {
 // UPDATE COMPANY DETAILS
 module.exports.updateCompany = async (req, res) => {
   const id = req.params.id
-  const { companyName, marketShare, headquarter, ceo, foundedIn } = req.body
-  const updatedCompanyData = await Company.findByIdAndUpdate(
-    id,
-    {
-      $set: {
-        companyName,
-        marketShare,
-        headquarter,
-        foundedIn,
-      },
-    },
-    {},
-  )
-  return res.status(201).json({
-    success: true,
-    data: updatedCompanyData,
-    message: 'Car Model updated successfully',
-  })
+  // const company = await Company.findById(id)
+  // res.send(company)
+  try {
+    const { companyName, marketShare, headquarter, ceo, foundedIn } = req.body
+    const companyData = await Company.findById(id)
+    // res.send(companyData)
+    if (companyData) {
+      const ceoData = await Ceo.findByIdAndUpdate(
+        companyData.ceo,
+        { ceo: ceo },
+        { new: true },
+      )
+      const company = await Company.findByIdAndUpdate(
+        id,
+        { companyName, marketShare, headquarter, foundedIn },
+        { new: true },
+      )
+      return res.status(201).json({
+        success: true,
+        data: company,
+        message: 'Car Model updated successfully',
+      })
+    }
+  } catch (error) {
+    return res.status(201).json({
+      error: error.message,
+      data: [],
+      message: 'Car Company does not updated',
+    })
+  }
+}
+
+// CREATE COMPANY WITH MODELS
+module.exports.createCompanyWithModel = async (req, res) => {
+  const { ceo, modelsData } = req.body
+  try {
+    const companyData = await Company.create({
+      companyName: req.body.companyName,
+      marketShare: req.body.marketShare,
+      headquarter: req.body.headquarter,
+      foundedIn: req.body.foundedIn,
+    })
+
+    if (companyData) {
+      const ceoName = await Ceo.create({
+        ceo,
+        company: companyData._id,
+      })
+      companyData.ceo = ceoName
+      companyData.save()
+    }
+    if (companyData) {
+      const modelObj = modelsData
+      const model = await Model.create(modelObj)
+
+      model.map((m) => {
+        m.company = companyData._id
+        m.save()
+      })
+
+      if (model) {
+        let company = await Company.findById(companyData._id)
+        model.map((m) => {
+          company.models.push(m._id)
+        })
+
+        company.save()
+        return res.status(200).json({
+          success: true,
+          data: company,
+          message: 'Company created successfully With models',
+        })
+      }
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message,
+      data: [],
+      message: 'Failed to create company with model',
+    })
+  }
 }

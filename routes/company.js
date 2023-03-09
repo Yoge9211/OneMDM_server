@@ -7,6 +7,10 @@ router.get('/', function (req, res) {
 })
 router.get('/companies', companyController.getAllCompanies)
 router.post('/create-company', companyController.create)
+router.post(
+  '/create-company-with-models',
+  companyController.createCompanyWithModel,
+)
 
 router.delete('/delete-company/:id', companyController.deleteCompany)
 router.get('/view/companyModels/:id', companyController.viewCompanyById)
