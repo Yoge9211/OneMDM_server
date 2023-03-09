@@ -5,3 +5,7 @@
 
 2- run this commond to install all the packages
 ## npm install
+
+
+3- to start the server
+## npm run dev
