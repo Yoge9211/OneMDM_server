@@ -9,3 +9,6 @@
 
 3- to start the server
 ## npm run dev
+
+# Deplyed Link
+https://one-mdm-server-yp13.vercel.app/
