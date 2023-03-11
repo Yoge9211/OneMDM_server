@@ -6,6 +6,26 @@ const Model = require('../models/model')
 module.exports.create = async (req, res) => {
   const { companyName, marketShare, headquarter, ceo, foundedIn } = req.body
   try {
+    const companyExists = await Company.findOne({
+      companyName: req.body.companyName,
+    })
+    if (companyExists) {
+      return res.status(200).json({
+        success: true,
+        data: companyExists,
+        message: 'Company already exists',
+      })
+    }
+    const ceoExist = await Ceo.findOne({ ceo: req.body.ceo })
+    if (ceoExist) {
+      return res.status(200).json({
+        success: true,
+        data: ceoExist,
+        message:
+          'You can not create company with ceo assigned to other company',
+      })
+    }
+
     const company = await Company.create({
       companyName,
       marketShare,
