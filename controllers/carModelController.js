@@ -4,6 +4,14 @@ const CarModel = require('../models/model')
 module.exports.createCarModel = async (req, res) => {
   try {
     const { modelName, length, width, seatingCapacity, companyId } = req.body
+    const modelExist = await CarModel.findOne({ modelName: modelName })
+    if (modelExist) {
+      return res.status(200).json({
+        success: true,
+        data: modelExist,
+        message: 'You can not add Two Models with same name',
+      })
+    }
     const model = await CarModel.create({
       modelName,
       length,
