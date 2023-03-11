@@ -142,6 +142,24 @@ module.exports.updateCompany = async (req, res) => {
 module.exports.createCompanyWithModel = async (req, res) => {
   const { ceo, modelsData } = req.body
   try {
+    const company = await Company.findOne({ companyName: req.body.companyName })
+    if (company) {
+      return res.status(200).json({
+        success: true,
+        data: company,
+        message: 'Company already exists',
+      })
+    }
+    const ceoExist = await Ceo.findOne({ ceo: req.body.ceo })
+    if (ceoExist) {
+      return res.status(200).json({
+        success: true,
+        data: ceoExist,
+        message:
+          'You can not create company with ceo assigned to other company',
+      })
+    }
+
     const companyData = await Company.create({
       companyName: req.body.companyName,
       marketShare: req.body.marketShare,
